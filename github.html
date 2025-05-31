@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHubUsers</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0e0e1a;
+      color: #f0f0f0;
+    }
+
+    header {
+      background: linear-gradient(to right, #1a1a3d, #0e0e1a);
+      padding: 1rem 2rem;
+      color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header-left h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #ffffff;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+    }
+
+    nav a {
+      color: #9fcfff;
+      margin-left: 1.2rem;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffffff;
+    }
+
+    .search-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      text-align: center;
+    }
+
+    .search-container input {
+      padding: 0.5rem;
+      width: 70%;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+    }
+
+    .search-container button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-left: 0.5rem;
+      background-color: #3d8bfd;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .results {
+      max-width: 800px;
+      margin: 2rem auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background-color: #1e1e2f;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .card img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    }
+
+    .card h3 {
+      margin: 0.5rem 0;
+      font-size: 1.2rem;
+      color: #9fcfff;
+    }
+
+    .card a {
+      display: inline-block;
+      margin-top: 0.5rem;
+      color: #76d1ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" class="logo">
+        <h1>GitHubUsers</h1>
+      </div>
+      <nav>
+        <a href="clock.html">Clock</a>
+        <a href="github.html">GitHubUsers</a>
+        <a href="weather.html">Weather</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search GitHub users...">
+    <button onclick="searchUsers()">Search</button>
+  </div>
+
+  <div class="results" id="results"></div>
+  <div class="message" id="message"></div>
+
+  <script>
+    async function searchUsers() {
+      const query = document.getElementById("searchInput").value.trim();
+      const results = document.getElementById("results");
+      const message = document.getElementById("message");
+      results.innerHTML = "";
+      message.textContent = "Searching...";
+
+      if (!query) {
+        message.textContent = "Please enter a username.";
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://api.github.com/search/users?q=${query}`);
+        if (!res.ok) throw new Error("Search failed");
+
+        const data = await res.json();
+        if (data.items.length === 0) {
+          message.textContent = "No users found.";
+          return;
+        }
+
+        message.textContent = "";
+        data.items.forEach(user => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img src="${user.avatar_url}" alt="${user.login}" />
+            <h3>${user.login}</h3>
+            <a href="user.html?username=${user.login}">View Details</a>
+          `;
+          results.appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        message.textContent = "Error fetching data.";
+      }
+    }
+  </script>
+</body>
+</html>

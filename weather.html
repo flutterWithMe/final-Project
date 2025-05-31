@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #74ebd5, #ACB6E5);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* استایل هدر */
+    header {
+      background-color: #2c3e50;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* استایل لینک‌های ناوبری در هدر */
+    header nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    /* افکت هاور برای لینک‌های هدر */
+    header nav a:hover {
+      color: #74ebd5;
+    }
+
+    h1 {
+      margin: 2rem 0 1rem;
+      font-size: 2.5rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    form {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #2980b9;
+      outline: none;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1f618d;
+    }
+
+    .weather-info {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2.5rem 2rem;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      max-width: 400px;
+      width: 100%;
+      transition: transform 0.3s ease;
+    }
+
+    .weather-info:hover {
+      transform: scale(1.03);
+    }
+
+    .weather-info h2 {
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2c3e50;
+      text-shadow: 0 0 3px rgba(115, 150, 255, 0.5);
+    }
+
+    /* استایل آیکون آب‌وهوا به سبک آیفون */
+    .weather-info img {
+      width: 130px;
+      height: 130px;
+      margin-bottom: 1.5rem;
+      border-radius: 35px;
+      box-shadow:
+        0 4px 15px rgba(115, 150, 255, 0.5),
+        inset 0 -5px 15px rgba(255, 255, 255, 0.6);
+      background: linear-gradient(145deg, #d9e6ff, #a3bfff);
+      transition: filter 0.3s ease;
+    }
+
+    .weather-info img:hover {
+      filter: drop-shadow(0 0 10px #74b9ff);
+    }
+
+    .weather-info p {
+      font-size: 1.3rem;
+      margin: 0.6rem 0;
+      font-weight: 600;
+      color: #34495e;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <a href="github.html">GitHub Users</a>
+      <a href="clock.html">Clock</a>
+      <a href="weather.html">Weather</a>
+    </nav>
+  </header>
+
+  <h1>Check the Weather</h1>
+
+  <form id="weather-form">
+    <input type="text" id="city-input" placeholder="Enter city name" required />
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="weather-info" id="weather-display" style="display: none;">
+    <h2 id="city-name"></h2>
+    <img id="weather-icon" alt="Weather Icon" />
+    <p id="temperature"></p>
+    <p id="description"></p>
+  </div>
+
+  <script>
+    const form = document.getElementById('weather-form');
+    const cityInput = document.getElementById('city-input');
+    const displayBox = document.getElementById('weather-display');
+    const cityName = document.getElementById('city-name');
+    const weatherIcon = document.getElementById('weather-icon');
+    const temperature = document.getElementById('temperature');
+    const description = document.getElementById('description');
+
+    const apiKey = 'f7752b100f99c95882432c3d06b51196';
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const city = cityInput.value.trim();
+      if (!city) return;
+
+      fetchWeatherForCity(city);
+    });
+
+    function fetchWeatherForCity(city) {
+      const url = `http://api.weatherstack.com/current?access_key=${apiKey}&query=${encodeURIComponent(city)}`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success === false || !data.current) {
+            alert("Couldn't fetch weather data. Try another city.");
+            displayBox.style.display = 'none';
+            return;
+          }
+
+          updateWeatherDisplay(data);
+        })
+        .catch(error => {
+          console.error("Error fetching weather:", error);
+          alert("Something went wrong. Please try again.");
+          displayBox.style.display = 'none';
+        });
+    }
+
+    function updateWeatherDisplay(data) {
+      cityName.textContent = `${data.location.name}, ${data.location.country}`;
+      weatherIcon.src = data.current.weather_icons[0];
+      weatherIcon.alt = data.current.weather_descriptions[0];
+      temperature.textContent = `Temperature: ${data.current.temperature}°C`;
+      description.textContent = data.current.weather_descriptions[0];
+      displayBox.style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ساعت دیجیتال و آنالوگ</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css');
+    body {
+      font-family: 'Vazir', sans-serif;
+      background: #282c34;
+      color: #fff;
+      margin: 0;
+      padding-top: 80px;
+      box-sizing: border-box;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: #2c3e50;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    header nav a:hover {
+      color: #74ebd5;
+    }
+
+    h1 {
+      margin: 25px auto;
+      font-weight: 700;
+      font-size: 2.4rem;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .clock-container {
+      display: flex;
+      gap: 60px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .digital-clock {
+      background: #3b3f4a;
+      border-radius: 12px;
+      padding: 30px 45px;
+      box-shadow: 0 0 15px #61dafbaa;
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 5px;
+      min-width: 280px;
+      text-align: center;
+      user-select: none;
+      font-feature-settings: "tnum";
+    }
+
+    .analog-clock {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      border: 10px solid #61dafb;
+      border-radius: 50%;
+      background: #20232a;
+      box-shadow: inset 0 0 10px #61dafb88, 0 0 25px #61dafbbb;
+    }
+
+    .analog-clock .center-dot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #61dafb;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      box-shadow: 0 0 6px #61dafbcc;
+    }
+
+    .hand {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      background: #61dafb;
+      transform-origin: bottom center;
+      transform: translateX(-50%) translateY(-100%) rotate(0deg);
+      transition: transform 0.2s ease-in-out;
+      border-radius: 4px;
+      box-shadow: 0 0 4px #61dafbcc;
+    }
+
+    .hand.hour {
+      width: 8px;
+      height: 70px;
+      z-index: 7;
+    }
+
+    .hand.minute {
+      width: 5px;
+      height: 100px;
+      z-index: 8;
+    }
+
+    .hand.second {
+      width: 2px;
+      height: 120px;
+      background: #ff6b6b;
+      box-shadow: 0 0 10px #ff6b6bcc;
+      z-index: 9;
+    }
+
+    .analog-clock .number {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      color: #61dafb;
+      font-weight: 700;
+      font-size: 1.2rem;
+      text-align: center;
+      line-height: 30px;
+      user-select: none;
+      font-feature-settings: "tnum";
+    }
+
+    @media (max-width: 650px) {
+      .clock-container {
+        flex-direction: column;
+        gap: 40px;
+      }
+
+      .digital-clock, .analog-clock {
+        width: 220px;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="github.html">GitHub Users</a>
+      <a href="clock.html">Clock</a>
+      <a href="weather.html">Weather</a>
+    </nav>
+  </header>
+
+  <h1>ساعت دیجیتال و آنالوگ</h1>
+
+  <div class="clock-container">
+    <div class="digital-clock" id="digitalClock">--:--:--</div>
+
+    <div class="analog-clock" aria-label="ساعت آنالوگ">
+      <div class="center-dot"></div>
+
+      <div class="number" id="number12">۱۲</div>
+      <div class="number" id="number1">۱</div>
+      <div class="number" id="number2">۲</div>
+      <div class="number" id="number3">۳</div>
+      <div class="number" id="number4">۴</div>
+      <div class="number" id="number5">۵</div>
+      <div class="number" id="number6">۶</div>
+      <div class="number" id="number7">۷</div>
+      <div class="number" id="number8">۸</div>
+      <div class="number" id="number9">۹</div>
+      <div class="number" id="number10">۱۰</div>
+      <div class="number" id="number11">۱۱</div>
+
+      <div class="hand hour" id="hourHand"></div>
+      <div class="hand minute" id="minuteHand"></div>
+      <div class="hand second" id="secondHand"></div>
+    </div>
+  </div>
+
+  <script>
+    function toPersianDigits(num) {
+      const persianDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return num.toString().replace(/\d/g, d => persianDigits[d]);
+    }
+
+    function updateDigitalClock() {
+      const now = new Date();
+      const h = toPersianDigits(now.getHours().toString().padStart(2, '0'));
+      const m = toPersianDigits(now.getMinutes().toString().padStart(2, '0'));
+      const s = toPersianDigits(now.getSeconds().toString().padStart(2, '0'));
+      document.getElementById('digitalClock').textContent = `${h}:${m}:${s}`;
+    }
+
+    function updateAnalogClock() {
+      const now = new Date();
+      const sec = now.getSeconds();
+      const min = now.getMinutes();
+      const hr = now.getHours() % 12;
+
+      const secDeg = sec * 6;
+      const minDeg = min * 6 + sec * 0.1;
+      const hrDeg = hr * 30 + min * 0.5;
+
+      document.getElementById('secondHand').style.transform = `translateX(-50%) translateY(-100%) rotate(${secDeg}deg)`;
+      document.getElementById('minuteHand').style.transform = `translateX(-50%) translateY(-100%) rotate(${minDeg}deg)`;
+      document.getElementById('hourHand').style.transform = `translateX(-50%) translateY(-100%) rotate(${hrDeg}deg)`;
+    }
+
+    function positionClockNumbers() {
+      const clock = document.querySelector('.analog-clock');
+      const radius = 120;
+      const centerX = clock.offsetWidth / 2;
+      const centerY = clock.offsetHeight / 2;
+
+      for (let i = 1; i <= 12; i++) {
+        const angle = (i * 30 - 90) * (Math.PI / 180);
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        const numberElement = document.getElementById(`number${i}`);
+        numberElement.style.left = `${x}px`;
+        numberElement.style.top = `${y}px`;
+        numberElement.style.transform = 'translate(-50%, -50%)';
+      }
+    }
+
+    function updateClock() {
+      updateDigitalClock();
+      updateAnalogClock();
+    }
+
+    positionClockNumbers();
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
+
