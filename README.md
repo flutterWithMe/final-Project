@@ -13,8 +13,7 @@ A responsive web application that combines real-time weather data, an interactiv
 
 ### ⏰ Interactive Clock
 - Real-time analog and digital clock
-- Date and day display
-- Timezone support
+
 - Smooth animation
 
 ### 👥 GitHub User Search
@@ -27,7 +26,7 @@ A responsive web application that combines real-time weather data, an interactiv
 
 **Frontend:**
 - HTML5
-- CSS3 (Flexbox, Grid, Animations)
+- CSS3 
 - JavaScript (ES6+)
 
 **APIs:**
